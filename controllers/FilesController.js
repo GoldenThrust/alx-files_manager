@@ -114,6 +114,19 @@ class FilesController {
       { $match: { userId, parentId } },
       { $skip: page * pageSize },
       { $limit: pageSize },
+      {
+        $project: {
+          _id: 0,
+          id: '$_id',
+          userId: '$userId',
+          name: '$name',
+          type: '$type',
+          isPublic: '$isPublic',
+          parentId: {
+            $cond: { if: { $eq: ['$parentId', '0'] }, then: 0, else: '$parentId' },
+          },
+        },
+      },
     ];
 
     const files = await (await dbClient.getCollection('files'))
