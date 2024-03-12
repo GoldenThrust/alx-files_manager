@@ -14,8 +14,15 @@ class AuthController {
     const auth = Buffer.from(authHeader.slice('Basic '.length), 'base64')
       .toString('utf-8')
       .split(':');
-    const email = auth[0];
-    const password = sha1(auth[1]);
+    let email;
+    let password;
+    try {
+      [email, password] = auth;
+      password = sha1(password);
+    } catch (e) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
 
     const user = await (
       await dbClient.getCollection('users')
