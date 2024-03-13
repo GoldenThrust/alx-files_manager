@@ -66,10 +66,10 @@ class FilesController {
     }
 
     const newFile = {
-      userId,
+      userId: new mongoDBCore.BSON.ObjectId(userId),
       name,
       type,
-      parentId,
+      parentId: new mongoDBCore.BSON.ObjectId(parentId),
       isPublic,
       localPath: type !== 'folder' ? localPath : null,
     };
@@ -97,7 +97,10 @@ class FilesController {
     try {
       file = await (
         await dbClient.getCollection('files')
-      ).findOne({ _id: new mongoDBCore.BSON.ObjectId(id), userId });
+      ).findOne({
+        _id: new mongoDBCore.BSON.ObjectId(id),
+        userId: new mongoDBCore.BSON.ObjectId(userId),
+      });
     } catch (err) {
       res.status(400).json({ error: 'Not Found' });
       return;
@@ -147,7 +150,12 @@ class FilesController {
       .aggregate(pipeline)
       .toArray();
 
-    res.json(files);
+    const modifyResult = files.map((file) => ({
+      ...file,
+      id: file._id,
+      _id: undefined,
+    }));
+    return res.json(modifyResult);
   }
 
   static async putPublish(req, res) {
