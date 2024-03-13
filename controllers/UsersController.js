@@ -36,9 +36,15 @@ class UserController {
   static async getMe(req, res) {
     const { userId } = req;
 
-    const user = await (
-      await dbClient.getCollection('users')
-    ).findOne({ _id: new mongoDBCore.BSON.ObjectId(userId) });
+    let user;
+    try {
+      user = await (
+        await dbClient.getCollection('users')
+      ).findOne({ _id: new mongoDBCore.BSON.ObjectId(userId) });
+    } catch (err) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
 
     if (!user) {
       res.status(401).json({ error: 'Unauthorized' });
