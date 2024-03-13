@@ -31,9 +31,15 @@ class FilesController {
     }
 
     if (parentId !== 0) {
-      const parentFile = await (
-        await dbClient.getCollection('files')
-      ).findOne({ _id: new mongoDBCore.BSON.ObjectId(parentId) });
+      let parentFile;
+      try {
+        parentFile = await (
+          await dbClient.getCollection('files')
+        ).findOne({ _id: new mongoDBCore.BSON.ObjectId(parentId) });
+      } catch (err) {
+        res.status(400).json({ error: 'Parent not found' });
+        return;
+      }
 
       if (!parentFile) {
         res.status(400).json({ error: 'Parent not found' });
@@ -73,7 +79,9 @@ class FilesController {
     ).insertOne(newFile);
     const fileId = result.insertedId.toString();
 
-    fileQueue.add({ userId, fileId });
+    if (type === 'image') {
+      fileQueue.add({ userId, fileId });
+    }
 
     res.status(201).json({
       id: fileId,
@@ -208,7 +216,6 @@ class FilesController {
       fileLocation = `${file.localPath}_${size}`;
     }
 
-    console.log(fileLocation);
     const token = req.header('X-Token');
     const userId = token ? await redisClient.get(`auth_${token}`) : null;
 

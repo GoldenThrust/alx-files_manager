@@ -25,7 +25,6 @@ class UserController {
 
             response.insertOne(newUser).then((result) => {
               userQueue.add({ userId: result.insertedId.toString() });
-              console.log(userQueue);
               res.status(201).json({ id: result.insertedId.toString(), email });
             });
           }
