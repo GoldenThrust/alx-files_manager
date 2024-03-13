@@ -1,10 +1,10 @@
 import sha1 from 'sha1';
 import mongoDBCore from 'mongodb/lib/core';
 import dbClient from '../utils/db';
+import { userQueue } from '../worker';
 
 class UserController {
   static postNew(req, res) {
-    console.log(req.body);
     const email = req.body ? req.body.email : null;
     const password = req.body ? req.body.password : null;
 
@@ -24,6 +24,8 @@ class UserController {
             };
 
             response.insertOne(newUser).then((result) => {
+              userQueue.add({ userId: result.insertedId.toString() });
+              console.log(userQueue);
               res.status(201).json({ id: result.insertedId.toString(), email });
             });
           }

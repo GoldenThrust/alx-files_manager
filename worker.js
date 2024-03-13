@@ -14,7 +14,7 @@ fileQueue.process(async (job) => {
     throw new Error('Missing fileId or userId');
   }
 
-  const file = await dbClient.getCollection('files').findOne({ _id: new mongoDBCore.BSON.ObjectId(fileId), userId });
+  const file = await (await dbClient.getCollection('files')).findOne({ _id: new mongoDBCore.BSON.ObjectId(fileId), userId });
 
   if (!file) {
     throw new Error('File not found');
@@ -45,7 +45,7 @@ userQueue.process(async (job) => {
     throw new Error('Missing userId');
   }
 
-  const user = await dbClient.getCollection('users').findOne({ _id: new mongoDBCore.BSON.ObjectId(userId) });
+  const user = await (await dbClient.getCollection('users')).findOne({ _id: new mongoDBCore.BSON.ObjectId(userId) });
 
   if (!user) {
     throw new Error('User not found');
