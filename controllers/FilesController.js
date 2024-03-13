@@ -93,9 +93,15 @@ class FilesController {
     const { id } = req.params;
     const { userId } = req;
 
-    const file = await (
-      await dbClient.getCollection('files')
-    ).findOne({ _id: new mongoDBCore.BSON.ObjectId(id), userId });
+    let file;
+    try {
+      file = await (
+        await dbClient.getCollection('files')
+      ).findOne({ _id: new mongoDBCore.BSON.ObjectId(id), userId });
+    } catch (err) {
+      res.status(400).json({ error: 'Not Found' });
+      return;
+    }
 
     if (!file) {
       res.status(404).json({ error: 'Not Found' });
@@ -147,7 +153,14 @@ class FilesController {
   static async putPublish(req, res) {
     const { id } = req.params;
     const { userId } = req;
-    const filter = { _id: new mongoDBCore.BSON.ObjectId(id), userId };
+
+    let filter;
+    try {
+      filter = { _id: new mongoDBCore.BSON.ObjectId(id), userId };
+    } catch (err) {
+      res.status(404).json({ error: 'Not Found' });
+      return;
+    }
 
     const file = await (await dbClient.getCollection('files')).findOne(filter);
 
@@ -174,7 +187,13 @@ class FilesController {
     const { id } = req.params;
     const { userId } = req;
 
-    const filter = { _id: new mongoDBCore.BSON.ObjectId(id), userId };
+    let filter;
+    try {
+      filter = { _id: new mongoDBCore.BSON.ObjectId(id), userId };
+    } catch (err) {
+      res.status(404).json({ error: 'Not Found' });
+      return;
+    }
 
     const file = await (await dbClient.getCollection('files')).findOne(filter);
 
@@ -201,9 +220,15 @@ class FilesController {
     const { size } = req.query;
     const fileId = req.params.id;
 
-    const file = await (
-      await dbClient.getCollection('files')
-    ).findOne({ _id: new mongoDBCore.BSON.ObjectId(fileId) });
+    let file;
+    try {
+      file = await (
+        await dbClient.getCollection('files')
+      ).findOne({ _id: new mongoDBCore.BSON.ObjectId(fileId) });
+    } catch (err) {
+      res.status(404).json({ error: 'Not found' });
+      return;
+    }
 
     if (!file) {
       res.status(404).json({ error: 'Not found' });
