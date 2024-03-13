@@ -147,7 +147,12 @@ class FilesController {
       .aggregate(pipeline)
       .toArray();
 
-    res.json(files);
+    const modifyResult = files.map((file) => ({
+      ...file,
+      id: file._id,
+      _id: undefined,
+    }));
+    return res.json(modifyResult);
   }
 
   static async putPublish(req, res) {
