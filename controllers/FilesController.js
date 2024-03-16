@@ -149,10 +149,10 @@ class FilesController {
 
     const modifyResult = files.map((file) => ({
       ...file,
-      id: file._id,
+      id: file.id,
       _id: undefined,
     }));
-    return res.json(modifyResult);
+    return res.json(modifyResult[0]);
   }
 
   static async putPublish(req, res) {
