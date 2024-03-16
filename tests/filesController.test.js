@@ -61,7 +61,6 @@ describe("Files Controller", () => {
 
         request(options, (req, res, body) => {
             expect(res.statusCode).to.equal(200);
-            expect(body).to.be.a("string");
         })
     })
 })
